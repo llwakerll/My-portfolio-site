@@ -1,0 +1,12 @@
+{
+  "admin": {
+    "password": "240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9",
+    "role": "admin",
+    "credits": 59
+  },
+  "kullanici": {
+    "password": "f925b94afa73a1de94eacaf43af7a878c838a4f6713f4bf2eeb7f63b66c60a6b",
+    "role": "user",
+    "credits": 0
+  }
+}
