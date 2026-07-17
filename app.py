@@ -10,143 +10,58 @@ from auth import (
     get_credits, has_enough_credits, deduct_credits, add_credits, set_credits,
     log_payment, read_payments,
     log_payment_request, read_payment_requests, approve_payment_request, reject_payment_request,
-    validate_username, validate_password, username_exists,
-    ARAMA_MALIYETI, ODEME_TELEFON, BASLANGIC_KREDISI,
+    ARAMA_MALIYETI, ODEME_TELEFON,
 )
 
 st.set_page_config(page_title="İşletme Bulucu", page_icon="📍", layout="wide")
 
 # ---------------------------------------------------------------------------
-# STİL (modern, canlı, profesyonel tema)
+# STİL (açık / kullanıcı dostu tema)
 # ---------------------------------------------------------------------------
 st.markdown("""
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <style>
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
-    header[data-testid="stHeader"] {background: transparent;}
-
-    html, body, [class*="css"] {
-        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-    }
 
     .stApp {
-        background:
-            radial-gradient(circle at 8% 8%, rgba(37, 99, 235, 0.10) 0%, transparent 40%),
-            radial-gradient(circle at 92% 92%, rgba(124, 58, 237, 0.08) 0%, transparent 40%),
-            linear-gradient(180deg, #f6f8fc 0%, #eef1f8 100%);
+        background: linear-gradient(180deg, #f4f7fb 0%, #eef2f9 100%);
     }
 
     h1, h2, h3, h4, p, label, span, div {
-        color: #0f172a;
-    }
-
-    /* --- Ana başlık / navbar --- */
-    .app-navbar {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        background: linear-gradient(120deg, #1d4ed8 0%, #4338ca 100%);
-        border-radius: 18px;
-        padding: 1.3rem 1.8rem;
-        margin-bottom: 1.6rem;
-        box-shadow: 0 12px 28px rgba(29, 78, 216, 0.25);
-    }
-    .app-navbar .brand {
-        font-size: 1.5rem;
-        font-weight: 800;
-        color: #ffffff;
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-    }
-    .app-navbar .tagline {
-        color: #dbeafe;
-        font-size: 0.85rem;
-        font-weight: 500;
-        margin-top: 0.15rem;
-    }
-
-    /* --- Giriş / Kayıt ekranı --- */
-    .auth-wrapper {
-        max-width: 460px;
-        margin: 2.2rem auto 0 auto;
-    }
-    .auth-hero {
-        text-align: center;
-        margin-bottom: 1.6rem;
-    }
-    .auth-hero .logo-circle {
-        width: 64px;
-        height: 64px;
-        border-radius: 20px;
-        background: linear-gradient(135deg, #2563eb, #7c3aed);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 1.9rem;
-        margin: 0 auto 0.9rem auto;
-        box-shadow: 0 10px 24px rgba(37, 99, 235, 0.35);
-    }
-    .auth-hero h1 {
-        font-size: 1.7rem;
-        font-weight: 800;
-        margin-bottom: 0.2rem;
-        background: linear-gradient(120deg, #1e293b, #4338ca);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-    }
-    .auth-hero p {
-        color: #64748b;
-        font-size: 0.92rem;
+        color: #1e293b;
     }
 
     .login-card {
         background: #ffffff;
         border: 1px solid #e2e8f0;
-        border-radius: 18px;
-        padding: 2.2rem 2.2rem 1.6rem 2.2rem;
-        box-shadow: 0 14px 32px rgba(15, 23, 42, 0.09);
-        animation: fadeUp 0.35s ease-out;
+        border-radius: 16px;
+        padding: 2.5rem;
+        max-width: 420px;
+        margin: 4rem auto 0 auto;
+        box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
     }
 
-    @keyframes fadeUp {
-        from { opacity: 0; transform: translateY(8px); }
-        to { opacity: 1; transform: translateY(0); }
+    .login-title {
+        text-align: center;
+        font-size: 1.7rem;
+        font-weight: 800;
+        color: #1e293b;
+        margin-bottom: 0.25rem;
     }
 
-    .feature-strip {
-        display: flex;
-        justify-content: center;
-        gap: 1.6rem;
-        margin-top: 1.6rem;
-        flex-wrap: wrap;
-    }
-    .feature-pill {
-        display: flex;
-        align-items: center;
-        gap: 0.4rem;
-        background: #ffffff;
-        border: 1px solid #e2e8f0;
-        border-radius: 999px;
-        padding: 0.4rem 0.9rem;
-        font-size: 0.8rem;
-        font-weight: 600;
-        color: #334155;
-        box-shadow: 0 2px 8px rgba(15, 23, 42, 0.05);
+    .login-subtitle {
+        text-align: center;
+        color: #64748b;
+        font-size: 0.9rem;
+        margin-bottom: 1.5rem;
     }
 
     div[data-testid="stMetric"] {
         background: #ffffff;
         border: 1px solid #e2e8f0;
-        border-radius: 14px;
+        border-radius: 12px;
         padding: 1rem;
-        box-shadow: 0 4px 14px rgba(15, 23, 42, 0.06);
-        transition: transform 0.15s ease;
-    }
-    div[data-testid="stMetric"]:hover {
-        transform: translateY(-2px);
+        box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
     }
 
     section[data-testid="stSidebar"] {
@@ -155,25 +70,12 @@ st.markdown("""
     }
 
     .stButton > button {
-        border-radius: 10px;
-        font-weight: 700;
-        transition: all 0.15s ease;
-    }
-    .stButton > button:hover {
-        transform: translateY(-1px);
-        box-shadow: 0 6px 14px rgba(15, 23, 42, 0.12);
+        border-radius: 8px;
+        font-weight: 600;
     }
     .stButton > button[kind="primary"] {
-        background: linear-gradient(120deg, #2563eb, #4338ca);
+        background-color: #2563eb;
         border-color: #2563eb;
-    }
-
-    .stTabs [data-baseweb="tab-list"] {
-        gap: 4px;
-    }
-    .stTabs [data-baseweb="tab"] {
-        border-radius: 8px 8px 0 0;
-        font-weight: 600;
     }
 
     .role-badge {
@@ -197,53 +99,20 @@ st.markdown("""
         border: 1px solid #fde68a;
     }
 
-    .navbar-credit-badge {
-        display: inline-block;
-        padding: 6px 16px;
-        border-radius: 999px;
-        font-size: 0.85rem;
-        font-weight: 700;
-        background: rgba(255,255,255,0.15);
-        color: #ffffff;
-        border: 1px solid rgba(255,255,255,0.35);
-    }
-
     .pricing-card {
         background: #ffffff;
         border: 1px solid #e2e8f0;
-        border-radius: 16px;
-        padding: 1.5rem 1.2rem;
+        border-radius: 14px;
+        padding: 1.4rem;
         text-align: center;
-        box-shadow: 0 4px 16px rgba(15, 23, 42, 0.06);
-        position: relative;
-        transition: transform 0.15s ease, box-shadow 0.15s ease;
-    }
-    .pricing-card:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 12px 26px rgba(37, 99, 235, 0.14);
-    }
-    .pricing-card.popular {
-        border: 2px solid #2563eb;
-    }
-    .pricing-card .badge-popular {
-        position: absolute;
-        top: -12px;
-        left: 50%;
-        transform: translateX(-50%);
-        background: linear-gradient(120deg, #2563eb, #7c3aed);
-        color: #fff;
-        font-size: 0.7rem;
-        font-weight: 800;
-        padding: 3px 12px;
-        border-radius: 999px;
-        white-space: nowrap;
+        box-shadow: 0 2px 10px rgba(15, 23, 42, 0.05);
     }
     .pricing-card h3 {
         margin: 0.2rem 0;
         color: #2563eb;
     }
     .pricing-card .fiyat {
-        font-size: 1.7rem;
+        font-size: 1.6rem;
         font-weight: 800;
         color: #1e293b;
     }
@@ -251,15 +120,13 @@ st.markdown("""
         color: #64748b;
         font-size: 0.85rem;
         margin-bottom: 0.8rem;
-        text-transform: uppercase;
-        letter-spacing: 0.04em;
     }
 
     .contact-card {
-        background: linear-gradient(120deg, #f0fdf4, #ecfdf5);
+        background: #f0fdf4;
         border: 1px solid #bbf7d0;
-        border-radius: 16px;
-        padding: 1.5rem;
+        border-radius: 14px;
+        padding: 1.4rem;
         margin-top: 1rem;
     }
     .contact-phone {
@@ -277,9 +144,7 @@ st.markdown("""
         border-radius: 8px;
         text-decoration: none;
         margin-top: 0.6rem;
-        transition: transform 0.15s ease;
     }
-    a.whatsapp-btn:hover { transform: translateY(-1px); }
     a.call-btn {
         display: inline-block;
         background: #2563eb;
@@ -290,9 +155,7 @@ st.markdown("""
         text-decoration: none;
         margin-top: 0.6rem;
         margin-left: 0.5rem;
-        transition: transform 0.15s ease;
     }
-    a.call-btn:hover { transform: translateY(-1px); }
     .pending-badge {
         display: inline-block;
         padding: 2px 10px;
@@ -301,15 +164,6 @@ st.markdown("""
         font-weight: 700;
         background: #fef3c7;
         color: #92400e;
-    }
-
-    .section-title {
-        font-size: 1.15rem;
-        font-weight: 800;
-        margin: 0.2rem 0 0.6rem 0;
-        display: flex;
-        align-items: center;
-        gap: 0.4rem;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -447,79 +301,25 @@ def to_excel_bytes(df: pd.DataFrame) -> bytes:
 
 
 # ---------------------------------------------------------------------------
-# GİRİŞ / KAYIT EKRANI
+# GİRİŞ EKRANI
 # ---------------------------------------------------------------------------
 def show_login():
-    st.markdown('<div class="auth-wrapper">', unsafe_allow_html=True)
-
-    st.markdown("""
-    <div class="auth-hero">
-        <div class="logo-circle">📍</div>
-        <h1>İşletme Bulucu</h1>
-        <p>Türkiye genelinde saniyeler içinde işletme verisi bul, dışa aktar, büyüt.</p>
-    </div>
-    """, unsafe_allow_html=True)
-
     st.markdown('<div class="login-card">', unsafe_allow_html=True)
+    st.markdown('<div class="login-title">📍 İşletme Bulucu</div>', unsafe_allow_html=True)
+    st.markdown('<div class="login-subtitle">Devam etmek için giriş yap</div>', unsafe_allow_html=True)
 
-    tab_login, tab_register = st.tabs(["🔐 Giriş Yap", "✨ Kayıt Ol"])
+    username = st.text_input("Kullanıcı Adı", key="login_user")
+    password = st.text_input("Şifre", type="password", key="login_pass")
 
-    with tab_login:
-        st.markdown("<div style='height:0.4rem'></div>", unsafe_allow_html=True)
-        username = st.text_input("Kullanıcı Adı", key="login_user", placeholder="kullanici_adi")
-        password = st.text_input("Şifre", type="password", key="login_pass", placeholder="••••••••")
-
-        if st.button("Giriş Yap", use_container_width=True, type="primary", key="login_btn"):
-            if not username or not password:
-                st.error("Lütfen kullanıcı adı ve şifreni gir.")
-            else:
-                role = verify_login(username, password)
-                if role:
-                    st.session_state.logged_in = True
-                    st.session_state.username = username
-                    st.session_state.role = role
-                    st.rerun()
-                else:
-                    st.error("Kullanıcı adı veya şifre hatalı.")
-
-    with tab_register:
-        st.markdown("<div style='height:0.4rem'></div>", unsafe_allow_html=True)
-        st.caption(f"Kayıt olduğunda hesabına otomatik olarak **{BASLANGIC_KREDISI} kredi** tanımlanır — ilk aramaların bizden. 🎉")
-
-        new_username = st.text_input("Kullanıcı Adı", key="reg_user", placeholder="en az 3 karakter")
-        new_password = st.text_input("Şifre", type="password", key="reg_pass", placeholder="en az 6 karakter")
-        new_password2 = st.text_input("Şifre (Tekrar)", type="password", key="reg_pass2", placeholder="şifreni tekrar gir")
-
-        if st.button("Hesap Oluştur", use_container_width=True, type="primary", key="register_btn"):
-            uname_err = validate_username(new_username)
-            pass_err = validate_password(new_password)
-
-            if uname_err:
-                st.error(uname_err)
-            elif pass_err:
-                st.error(pass_err)
-            elif new_password != new_password2:
-                st.error("Şifreler birbiriyle uyuşmuyor.")
-            elif username_exists(new_username.strip()):
-                st.error("Bu kullanıcı adı zaten alınmış, başka bir tane dene.")
-            else:
-                created = add_user(new_username.strip(), new_password, role="user")
-                if created:
-                    st.success("Hesabın oluşturuldu! Şimdi giriş yapabilirsin. 🎉")
-                    st.balloons()
-                else:
-                    st.error("Hesap oluşturulamadı, lütfen tekrar dene.")
-
-    st.markdown('</div>', unsafe_allow_html=True)
-
-    st.markdown("""
-    <div class="feature-strip">
-        <div class="feature-pill">🗺️ OpenStreetMap verisi</div>
-        <div class="feature-pill">⚡ Saniyeler içinde sonuç</div>
-        <div class="feature-pill">⬇️ Excel / CSV dışa aktarım</div>
-        <div class="feature-pill">🔒 Güvenli giriş</div>
-    </div>
-    """, unsafe_allow_html=True)
+    if st.button("Giriş Yap", use_container_width=True, type="primary"):
+        role = verify_login(username, password)
+        if role:
+            st.session_state.logged_in = True
+            st.session_state.username = username
+            st.session_state.role = role
+            st.rerun()
+        else:
+            st.error("Kullanıcı adı veya şifre hatalı.")
 
     st.markdown('</div>', unsafe_allow_html=True)
 
@@ -653,14 +453,10 @@ def show_payment_section():
     )
 
     cols = st.columns(len(KREDI_PAKETLERI))
-    for i, (col, paket) in enumerate(zip(cols, KREDI_PAKETLERI)):
+    for col, paket in zip(cols, KREDI_PAKETLERI):
         with col:
-            is_popular = (i == 1 and len(KREDI_PAKETLERI) >= 2)
-            card_class = "pricing-card popular" if is_popular else "pricing-card"
-            badge_html = '<div class="badge-popular">⭐ En Popüler</div>' if is_popular else ""
             st.markdown(f"""
-            <div class="{card_class}">
-                {badge_html}
+            <div class="pricing-card">
                 <div class="aciklama">{paket['ad']} Paket</div>
                 <h3>{paket['kredi']} kredi</h3>
                 <div class="fiyat">{paket['fiyat']:.2f} TL</div>
@@ -748,18 +544,8 @@ def show_main_app():
             custom_tag = st.text_input("Etiket (örn: shop)", value="shop")
             custom_value = st.text_input("Değer (örn: bookstore)", value="")
 
-    guncel_kredi_nav = get_credits(st.session_state.username)
-    st.markdown(f"""
-    <div class="app-navbar">
-        <div>
-            <div class="brand">📍 İşletme Bulucu</div>
-            <div class="tagline">OpenStreetMap verileriyle çalışır — API key veya kart bilgisi gerekmez.</div>
-        </div>
-        <div class="navbar-right" style="display:flex; align-items:center; gap:0.7rem;">
-            <span class="navbar-credit-badge">💳 {guncel_kredi_nav} kredi</span>
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
+    st.title("📍 İşletme Bulucu")
+    st.caption("OpenStreetMap verileriyle çalışır — API key, kredi kartı veya limit yok.")
 
     if st.session_state.role == "admin":
         with st.expander("🛠️ Yönetici Paneli", expanded=False):
